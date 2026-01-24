@@ -10,7 +10,7 @@
   - Fixes #<issue_number>
 -->
 
-## Screenshots
+## Screenshots/Videos
 
-<!-- Add screenshots of the changes if applicable. -->
+<!-- Add screenshots or videos of the changes if applicable. -->
 
