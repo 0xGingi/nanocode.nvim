@@ -3,7 +3,7 @@
 ---@class blink.cmp.Source
 local source = {}
 
----@type opencode.Context|nil
+---@type nanocode.Context|nil
 source.context = nil
 
 local is_setup = false
@@ -15,11 +15,11 @@ function source.setup(sources)
   end
   is_setup = true
 
-  require("blink.cmp").add_source_provider("opencode", {
-    module = "opencode.cmp.blink",
+  require("blink.cmp").add_source_provider("nanocode", {
+    module = "nanocode.cmp.blink",
   })
   for _, src in ipairs(sources) do
-    require("blink.cmp").add_filetype_source("opencode_ask", src)
+    require("blink.cmp").add_filetype_source("nanocode_ask", src)
   end
 end
 
@@ -33,13 +33,13 @@ function source.new(opts)
 end
 
 function source:enabled()
-  return vim.bo.filetype == "opencode_ask"
+  return vim.bo.filetype == "nanocode_ask"
 end
 
 function source:get_trigger_characters()
   -- Parse `opts.context` to return all non-alphanumeric first characters in placeholders
   local trigger_chars = {}
-  for placeholder, _ in pairs(require("opencode.config").opts.contexts) do
+  for placeholder, _ in pairs(require("nanocode.config").opts.contexts) do
     local first_char = placeholder:sub(1, 1)
     if not first_char:match("%w") and not vim.tbl_contains(trigger_chars, first_char) then
       table.insert(trigger_chars, first_char)
@@ -53,7 +53,7 @@ function source:get_completions(ctx, callback)
   -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#completionItem
   --- @type lsp.CompletionItem[]
   local items = {}
-  for placeholder in pairs(require("opencode.config").opts.contexts) do
+  for placeholder in pairs(require("nanocode.config").opts.contexts) do
     --- @type lsp.CompletionItem
     local item = {
       label = placeholder,
@@ -131,7 +131,7 @@ function source:resolve(item, callback)
         })
 
         local extmarks = self.context.extmarks(rendered.output)
-        local ns_id = vim.api.nvim_create_namespace("opencode_enum_highlight")
+        local ns_id = vim.api.nvim_create_namespace("nanocode_enum_highlight")
         for _, extmark in ipairs(extmarks) do
           vim.api.nvim_buf_set_extmark(buf, ns_id, (extmark.row or 1) - 1, extmark.col, {
             end_col = extmark.end_col,

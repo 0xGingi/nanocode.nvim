@@ -1,14 +1,14 @@
 local M = {}
 
----An `opencode` server process.
----@class opencode.cli.server.Server : opencode.cli.server.Process
+---An `nanocode` server process.
+---@class nanocode.cli.server.Server : nanocode.cli.server.Process
 ---
 ---Populated by calling the server's `/path` endpoint at `port`.
 ---@field cwd string
 
----An `opencode` process.
+---An `nanocode` process.
 ---Retrieval is platform-dependent.
----@class opencode.cli.server.Process
+---@class nanocode.cli.server.Process
 ---@field pid number
 ---@field port number
 
@@ -17,12 +17,12 @@ local function is_windows()
   return vim.fn.has("win32") == 1
 end
 
----@return opencode.cli.server.Process[]
+---@return nanocode.cli.server.Process[]
 local function get_processes_unix()
   -- Find PIDs by command line pattern.
-  -- We filter for `--port` to avoid matching other `opencode`-related processes (LSPs etc.)
-  local pgrep = vim.system({ "pgrep", "-f", "opencode.*--port" }, { text = true }):wait()
-  require("opencode.util").check_system_call(pgrep, "pgrep")
+  -- We filter for `--port` to avoid matching other `nanocode`-related processes (LSPs etc.)
+  local pgrep = vim.system({ "pgrep", "-f", "nanocode.*--port" }, { text = true }):wait()
+  require("nanocode.util").check_system_call(pgrep, "pgrep")
 
   local processes = {}
   for pgrep_line in pgrep.stdout:gmatch("[^\r\n]+") do
@@ -32,7 +32,7 @@ local function get_processes_unix()
       local lsof = vim
         .system({ "lsof", "-w", "-iTCP", "-sTCP:LISTEN", "-P", "-n", "-a", "-p", tostring(pid) }, { text = true })
         :wait()
-      require("opencode.util").check_system_call(lsof, "lsof")
+      require("nanocode.util").check_system_call(lsof, "lsof")
       for line in lsof.stdout:gmatch("[^\r\n]+") do
         local parts = vim.split(line, "%s+")
         if parts[1] ~= "COMMAND" then -- Skip header
@@ -53,10 +53,10 @@ local function get_processes_unix()
   return processes
 end
 
----@return opencode.cli.server.Process[]
+---@return nanocode.cli.server.Process[]
 local function get_processes_windows()
   local ps_script = [[
-Get-Process -Name '*opencode*' -ErrorAction SilentlyContinue |
+Get-Process -Name '*nanocode*' -ErrorAction SilentlyContinue |
 ForEach-Object {
   $ports = Get-NetTCPConnection -State Listen -OwningProcess $_.Id -ErrorAction SilentlyContinue
   if ($ports) {
@@ -67,7 +67,7 @@ ForEach-Object {
 } | ConvertTo-Json -Compress
 ]]
   local ps = vim.system({ "powershell", "-NoProfile", "-Command", ps_script }):wait()
-  require("opencode.util").check_system_call(ps, "PowerShell")
+  require("nanocode.util").check_system_call(ps, "PowerShell")
   if ps.stdout == "" then
     return {}
   end
@@ -83,7 +83,7 @@ ForEach-Object {
   return processes
 end
 
----@return opencode.cli.server.Server[]
+---@return nanocode.cli.server.Server[]
 local function find_servers()
   local processes
   if is_windows() then
@@ -92,15 +92,15 @@ local function find_servers()
     processes = get_processes_unix()
   end
   if #processes == 0 then
-    error("No `opencode` processes found", 0)
+    error("No `nanocode` processes found", 0)
   end
-  -- Filter out processes that aren't valid opencode servers.
-  -- pgrep -f 'opencode' may match other processes (e.g., language servers
-  -- started by opencode) that have 'opencode' in their path or arguments.
-  ---@type opencode.cli.server.Server[]
+  -- Filter out processes that aren't valid nanocode servers.
+  -- pgrep -f 'nanocode' may match other processes (e.g., language servers
+  -- started by nanocode) that have 'nanocode' in their path or arguments.
+  ---@type nanocode.cli.server.Server[]
   local servers = {}
   for _, process in ipairs(processes) do
-    local ok, path = pcall(require("opencode.cli.client").get_path, process.port)
+    local ok, path = pcall(require("nanocode.cli.client").get_path, process.port)
     if ok then
       table.insert(servers, {
         pid = process.pid,
@@ -110,7 +110,7 @@ local function find_servers()
     end
   end
   if #servers == 0 then
-    error("No valid `opencode` servers found", 0)
+    error("No valid `nanocode` servers found", 0)
   end
   return servers
 end
@@ -122,7 +122,7 @@ local function is_descendant_of_neovim(pid)
   -- Neovim will not be the direct parent.
   for _ = 1, 10 do -- limit to 10 steps to avoid infinite loop
     local ps = vim.system({ "ps", "-o", "ppid=", "-p", tostring(current_pid) }, { text = true }):wait()
-    require("opencode.util").check_system_call(ps, "ps")
+    require("nanocode.util").check_system_call(ps, "ps")
     local parent_pid = tonumber(ps.stdout)
     if not parent_pid then
       return false
@@ -137,7 +137,7 @@ local function is_descendant_of_neovim(pid)
   return false
 end
 
----@return opencode.cli.server.Server
+---@return nanocode.cli.server.Server
 local function find_server_inside_nvim_cwd()
   local found_server
   local nvim_cwd = vim.fn.getcwd()
@@ -149,7 +149,7 @@ local function find_server_inside_nvim_cwd()
       normalized_server_cwd = server.cwd:gsub("/", "\\")
       normalized_nvim_cwd = nvim_cwd:gsub("/", "\\")
     end
-    -- CWDs match exactly, or `opencode`'s CWD is under neovim's CWD.
+    -- CWDs match exactly, or `nanocode`'s CWD is under neovim's CWD.
     if normalized_server_cwd:find(normalized_nvim_cwd, 1, true) == 1 then
       found_server = server
       -- On Unix, prioritize embedded
@@ -159,7 +159,7 @@ local function find_server_inside_nvim_cwd()
     end
   end
   if not found_server then
-    error("No `opencode` servers inside Neovim's CWD", 0)
+    error("No `nanocode` servers inside Neovim's CWD", 0)
   end
   return found_server
 end
@@ -170,7 +170,7 @@ local function poll_for_port(fn, callback)
   local retries = 0
   local timer = vim.uv.new_timer()
   if not timer then
-    callback(false, "Failed to create timer for polling `opencode` port")
+    callback(false, "Failed to create timer for polling `nanocode` port")
     return
   end
   local timer_closed = false
@@ -197,24 +197,24 @@ local function poll_for_port(fn, callback)
   )
 end
 
----Attempt to get the `opencode` server's port. Tries, in order:
+---Attempt to get the `nanocode` server's port. Tries, in order:
 ---1. A process responding on `opts.port`.
----2. Any `opencode` process running inside Neovim's CWD. Prioritizes embedded.
+---2. Any `nanocode` process running inside Neovim's CWD. Prioritizes embedded.
 ---3. Calling `opts.provider.start` and polling for the port.
 ---
 ---@param launch boolean? Whether to launch a new server if none found. Defaults to true.
 function M.get_port(launch)
   launch = launch ~= false
-  return require("opencode.promise").new(function(resolve, reject)
-    local configured_port = require("opencode.config").opts.port
+  return require("nanocode.promise").new(function(resolve, reject)
+    local configured_port = require("nanocode.config").opts.port
     local find_port_fn = function()
       if configured_port then
         -- Test the configured port
-        local ok, path = pcall(require("opencode.cli.client").get_path, configured_port)
+        local ok, path = pcall(require("nanocode.cli.client").get_path, configured_port)
         if ok and path then
           return configured_port
         else
-          error("No `opencode` responding on configured port: " .. configured_port, 0)
+          error("No `nanocode` responding on configured port: " .. configured_port, 0)
         end
       else
         return find_server_inside_nvim_cwd().port
@@ -226,10 +226,10 @@ function M.get_port(launch)
       return
     end
     if launch then
-      vim.notify(initial_result .. " — starting `opencode`…", vim.log.levels.INFO, { title = "opencode" })
-      local start_ok, start_result = pcall(require("opencode.provider").start)
+      vim.notify(initial_result .. " — starting `nanocode`…", vim.log.levels.INFO, { title = "nanocode" })
+      local start_ok, start_result = pcall(require("nanocode.provider").start)
       if not start_ok then
-        reject("Error starting `opencode`: " .. start_result)
+        reject("Error starting `nanocode`: " .. start_result)
         return
       end
     end

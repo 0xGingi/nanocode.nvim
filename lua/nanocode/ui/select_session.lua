@@ -11,11 +11,11 @@ local function ellipsize(s, max_len)
 end
 
 function M.select_session()
-  require("opencode.cli.server")
+  require("nanocode.cli.server")
     .get_port()
     :next(function(port)
-      return require("opencode.promise").new(function(resolve)
-        require("opencode.cli.client").get_sessions(port, function(sessions)
+      return require("nanocode.promise").new(function(resolve)
+        require("nanocode.cli.client").get_sessions(port, function(sessions)
           resolve({ sessions = sessions, port = port })
         end)
       end)
@@ -36,7 +36,7 @@ function M.select_session()
         end,
       }, function(choice)
         if choice then
-          require("opencode.cli.client").select_session(session_data.port, choice.id)
+          require("nanocode.cli.client").select_session(session_data.port, choice.id)
         end
       end)
     end)

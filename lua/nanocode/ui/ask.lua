@@ -2,30 +2,30 @@
 
 local M = {}
 
----@class opencode.ask.Opts
+---@class nanocode.ask.Opts
 ---
 ---Text of the prompt.
 ---@field prompt? string
 ---
 ---Completion sources to automatically register when using [`snacks.input`](https://github.com/folke/snacks.nvim/blob/main/docs/input.md) and [`blink.cmp`](https://github.com/Saghen/blink.cmp).
----The `"opencode"` source offers completions and previews for contexts and `opencode` subagents.
+---The `"nanocode"` source offers completions and previews for contexts and `nanocode` subagents.
 ---@field blink_cmp_sources? string[]
 ---
 ---Options for [`snacks.input`](https://github.com/folke/snacks.nvim/blob/main/docs/input.md).
 ---@field snacks? snacks.input.Opts
 
----Input a prompt for `opencode`.
+---Input a prompt for `nanocode`.
 ---
 --- - Press the up arrow to browse recent asks.
---- - Highlights and completes contexts and `opencode` subagents.
+--- - Highlights and completes contexts and `nanocode` subagents.
 ---   - Press `<Tab>` to trigger built-in completion.
 ---   - Registers `opts.ask.blink_cmp_sources` when using `snacks.input` and `blink.cmp`.
 ---
 ---@param default? string Text to pre-fill the input with.
----@param opts? opencode.api.prompt.Opts Options for `prompt()`.
+---@param opts? nanocode.api.prompt.Opts Options for `prompt()`.
 function M.ask(default, opts)
   opts = opts or {}
-  opts.context = opts.context or require("opencode.context").new()
+  opts.context = opts.context or require("nanocode.context").new()
 
   ---@type snacks.input.Opts
   local input_opts = {
@@ -37,7 +37,7 @@ function M.ask(default, opts)
         return { extmark.col, extmark.end_col, extmark.hl_group }
       end, opts.context.extmarks(rendered.input))
     end,
-    completion = "customlist,v:lua.opencode_completion",
+    completion = "customlist,v:lua.nanocode_completion",
     -- `snacks.input`-only options
     win = {
       b = {
@@ -46,7 +46,7 @@ function M.ask(default, opts)
       },
       bo = {
         -- Custom filetype to enable `blink.cmp` source on
-        filetype = "opencode_ask",
+        filetype = "nanocode_ask",
       },
       on_buf = function(win)
         -- Wait as long as possible to check for `blink.cmp` loaded - many users lazy-load on `InsertEnter`.
@@ -56,7 +56,7 @@ function M.ask(default, opts)
           buffer = win.buf,
           callback = function()
             if package.loaded["blink.cmp"] then
-              require("opencode.cmp.blink").setup(require("opencode.config").opts.ask.blink_cmp_sources)
+              require("nanocode.cmp.blink").setup(require("nanocode.config").opts.ask.blink_cmp_sources)
             end
           end,
         })
@@ -65,14 +65,14 @@ function M.ask(default, opts)
   }
   -- Nest `snacks.input` options under `opts.ask.snacks` for consistency with other `snacks`-exclusive config,
   -- and to keep its fields optional. Double-merge is kinda ugly but seems like the lesser evil.
-  input_opts = vim.tbl_deep_extend("force", input_opts, require("opencode.config").opts.ask)
-  input_opts = vim.tbl_deep_extend("force", input_opts, require("opencode.config").opts.ask.snacks)
+  input_opts = vim.tbl_deep_extend("force", input_opts, require("nanocode.config").opts.ask)
+  input_opts = vim.tbl_deep_extend("force", input_opts, require("nanocode.config").opts.ask.snacks)
 
-  require("opencode.cli.server")
+  require("nanocode.cli.server")
     .get_port()
     :next(function(port)
-      return require("opencode.promise").new(function(resolve)
-        require("opencode.cli.client").get_agents(port, function(agents)
+      return require("nanocode.promise").new(function(resolve)
+        require("nanocode.cli.client").get_agents(port, function(agents)
           opts.context.agents = vim.tbl_filter(function(agent)
             return agent.mode == "subagent"
           end, agents)
@@ -82,12 +82,12 @@ function M.ask(default, opts)
       end)
     end)
     :next(function()
-      require("opencode.cmp.blink").context = opts.context
+      require("nanocode.cmp.blink").context = opts.context
 
       vim.ui.input(input_opts, function(value)
         if value and value ~= "" then
           opts.context:clear()
-          require("opencode").prompt(value, opts)
+          require("nanocode").prompt(value, opts)
         else
           opts.context:resume()
         end
@@ -101,23 +101,23 @@ end
 -- FIX: Overridden by blink.cmp cmdline completion if both are enabled, and that won't have our items.
 -- Possible to register our blink source there? But only active in our own vim.ui.input calls.
 
----Completion function for context placeholders and `opencode` subagents.
+---Completion function for context placeholders and `nanocode` subagents.
 ---Must be a global variable for use with `vim.ui.select`.
 ---
 ---@param ArgLead string The text being completed.
 ---@param CmdLine string The entire current input line.
 ---@param CursorPos number The cursor position in the input line.
 ---@return table<string> items A list of filtered completion items.
-_G.opencode_completion = function(ArgLead, CmdLine, CursorPos)
+_G.nanocode_completion = function(ArgLead, CmdLine, CursorPos)
   -- Not sure if it's me or vim, but ArgLead = CmdLine... so we have to parse and complete the entire line, not just the last word.
   local start_idx, end_idx = CmdLine:find("([^%s]+)$")
   local latest_word = start_idx and CmdLine:sub(start_idx, end_idx) or nil
 
   local completions = {}
-  for placeholder, _ in pairs(require("opencode.config").opts.contexts) do
+  for placeholder, _ in pairs(require("nanocode.config").opts.contexts) do
     table.insert(completions, placeholder)
   end
-  for _, agent in ipairs(require("opencode.cmp.blink").context.agents or {}) do
+  for _, agent in ipairs(require("nanocode.cmp.blink").context.agents or {}) do
     table.insert(completions, "@" .. agent.name)
   end
 

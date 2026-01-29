@@ -1,17 +1,17 @@
----Provide `opencode` in a [`wezterm`](https://wezterm.org/index.html) pane in the current window.
----@class opencode.provider.Wezterm : opencode.Provider
+---Provide `nanocode` in a [`wezterm`](https://wezterm.org/index.html) pane in the current window.
+---@class nanocode.provider.Wezterm : nanocode.Provider
 ---
----@field opts opencode.provider.wezterm.Opts
----@field pane_id? string The `wezterm` pane ID where `opencode` is running (internal use only).
+---@field opts nanocode.provider.wezterm.Opts
+---@field pane_id? string The `wezterm` pane ID where `nanocode` is running (internal use only).
 local Wezterm = {}
 Wezterm.__index = Wezterm
 Wezterm.name = "wezterm"
 
 ---`wezterm` options for creating the pane.
 ---Strictly mimics the options available in the `wezterm cli split-pane --help` command
----@class opencode.provider.wezterm.Opts
+---@class nanocode.provider.wezterm.Opts
 ---
----Direction in which the pane that runs opencode is spawn, defaults to bottom
+---Direction in which the pane that runs nanocode is spawn, defaults to bottom
 ---@field direction? "left" | "top" | "right" | "bottom"
 ---
 ---The number of cells that the new split should have expressed as a percentage of the available
@@ -21,8 +21,8 @@ Wezterm.name = "wezterm"
 ---Rather than splitting the active pane, split the entire window
 ---@field top_level? boolean
 
----@param opts? opencode.provider.wezterm.Opts
----@return opencode.provider.Wezterm
+---@param opts? nanocode.provider.wezterm.Opts
+---@return nanocode.provider.Wezterm
 function Wezterm.new(opts)
   local self = setmetatable({}, Wezterm)
   self.opts = opts or {}
@@ -52,9 +52,9 @@ function Wezterm.health()
   return true
 end
 
----Retrieve the `wezterm` pane ID associated with the running `opencode` instance.
----This establishes a direct link between the spawned `opencode` pane and its ID.
----If the `opencode` pane is closed and a new one is created manually, it cannot
+---Retrieve the `wezterm` pane ID associated with the running `nanocode` instance.
+---This establishes a direct link between the spawned `nanocode` pane and its ID.
+---If the `nanocode` pane is closed and a new one is created manually, it cannot
 ---still be tracked by this ID.
 ---@return string|nil pane_id
 function Wezterm:get_pane_id()
@@ -92,7 +92,7 @@ function Wezterm:get_pane_id()
   return nil
 end
 
----Create or kill the `opencode` pane.
+---Create or kill the `nanocode` pane.
 function Wezterm:toggle()
   local pane_id = self:get_pane_id()
   if pane_id then
@@ -102,7 +102,7 @@ function Wezterm:toggle()
   end
 end
 
----Start `opencode` in pane.
+---Start `nanocode` in pane.
 function Wezterm:start()
   local pane_id = self:get_pane_id()
   if not pane_id then
@@ -131,7 +131,7 @@ function Wezterm:start()
   end
 end
 
----Kill the `opencode` pane.
+---Kill the `nanocode` pane.
 function Wezterm:stop()
   local pane_id = self:get_pane_id()
   if pane_id then

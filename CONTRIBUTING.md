@@ -1,11 +1,11 @@
-## Contributing to `opencode.nvim`
+## Contributing to `nanocode.nvim`
 
 Thank you for wanting to contribute!
 
 ## Guidelines
 
 - **Align with project vision**
-  - Integrate Neovim with `opencode`'s TUI to enable novel functionality and convenience.
+  - Integrate Neovim with `nanocode`'s TUI to enable novel functionality and convenience.
   - Simple, intuitive UX.
   - If unsure, propose changes in an issue or discussion first.
 - **Add more value than maintenance burden**

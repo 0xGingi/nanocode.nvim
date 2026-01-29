@@ -1,40 +1,40 @@
----Provide `opencode` in a [`tmux`](https://github.com/tmux/tmux) pane in the current window.
----@class opencode.provider.Tmux : opencode.Provider
+---Provide `nanocode` in a [`tmux`](https://github.com/tmux/tmux) pane in the current window.
+---@class nanocode.provider.Tmux : nanocode.Provider
 ---
----@field opts opencode.provider.tmux.Opts
+---@field opts nanocode.provider.tmux.Opts
 ---
----The `tmux` pane ID where `opencode` is running (internal use only).
+---The `tmux` pane ID where `nanocode` is running (internal use only).
 ---@field pane_id? string
 local Tmux = {}
 Tmux.__index = Tmux
 Tmux.name = "tmux"
 
----@class opencode.provider.tmux.Opts
+---@class nanocode.provider.tmux.Opts
 ---
 ---`tmux` options for creating the pane.
 ---@field options? string
 ---
----Focus the opencode pane when created. Default: `false`
+---Focus the nanocode pane when created. Default: `false`
 ---@field focus? boolean
 --
----Allow `allow-passthrough` on the opencode pane.
--- When enabled, opencode.nvim will use your configured tmux `allow-passthrough` option on its pane.
--- This allows opencode to use OSC escape sequences, but may leak escape codes to the buffer
+---Allow `allow-passthrough` on the nanocode pane.
+-- When enabled, nanocode.nvim will use your configured tmux `allow-passthrough` option on its pane.
+-- This allows nanocode to use OSC escape sequences, but may leak escape codes to the buffer
 -- (e.g., "=31337;OK" appearing in your buffer).
 --
--- Limitations of having allow-passthrough disabled in the opencode pane:
+-- Limitations of having allow-passthrough disabled in the nanocode pane:
 -- - can't display images
 -- - can't use special (terminal specific; non-system) clipboards
 -- - may have issues setting window properties like the title from the pane
 --
 -- If you enable this, consider also enabling `focus` to auto-focus the pane on creation,
--- which can help avoid OSC code leakage while opencode is sending escape sequences on startup.
+-- which can help avoid OSC code leakage while nanocode is sending escape sequences on startup.
 --
 -- Default: `false` (allow-passthrough is disabled to prevent OSC code leakage)
 ---@field allow_passthrough? boolean
 
----@param opts? opencode.provider.tmux.Opts
----@return opencode.provider.Tmux
+---@param opts? nanocode.provider.tmux.Opts
+---@return nanocode.provider.Tmux
 function Tmux.new(opts)
   local self = setmetatable({}, Tmux)
   self.opts = opts or {}
@@ -59,7 +59,7 @@ function Tmux.health()
   return true
 end
 
----Get the `tmux` pane ID where we started `opencode`, if it still exists.
+---Get the `tmux` pane ID where we started `nanocode`, if it still exists.
 ---Ideally we'd find existing panes by title or command, but `tmux` doesn't make that straightforward.
 ---@return string|nil pane_id
 function Tmux:get_pane_id()
@@ -78,7 +78,7 @@ function Tmux:get_pane_id()
   return self.pane_id
 end
 
----Create or kill the `opencode` pane.
+---Create or kill the `nanocode` pane.
 function Tmux:toggle()
   local pane_id = self:get_pane_id()
   if pane_id then
@@ -88,7 +88,7 @@ function Tmux:toggle()
   end
 end
 
----Start `opencode` in pane.
+---Start `nanocode` in pane.
 function Tmux:start()
   local pane_id = self:get_pane_id()
   if not pane_id then
@@ -104,7 +104,7 @@ function Tmux:start()
   end
 end
 
----Kill the `opencode` pane.
+---Kill the `nanocode` pane.
 function Tmux:stop()
   local pane_id = self:get_pane_id()
   if pane_id then

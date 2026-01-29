@@ -4,16 +4,16 @@
 ---Particularly useful when inputting or selecting a prompt
 ---because that changes the active mode, window, etc.
 ---So this stores state prior to that.
----@class opencode.Context
+---@class nanocode.Context
 ---@field win integer
 ---@field buf integer
 ---@field cursor integer[] The cursor positon. { row, col } (1,0-based).
----@field range? opencode.context.Range The operator range or visual selection range.
----@field agents? opencode.cli.client.Agent[] Subagents available in `opencode`.
+---@field range? nanocode.context.Range The operator range or visual selection range.
+---@field agents? nanocode.cli.client.Agent[] Subagents available in `nanocode`.
 local Context = {}
 Context.__index = Context
 
-local ns_id = vim.api.nvim_create_namespace("OpencodeContext")
+local ns_id = vim.api.nvim_create_namespace("nanocodeContext")
 
 local function is_buf_valid(buf)
   return vim.api.nvim_get_option_value("buftype", { buf = buf }) == "" and vim.api.nvim_buf_get_name(buf) ~= ""
@@ -35,13 +35,13 @@ local function last_used_valid_win()
   return last_used_win
 end
 
----@class opencode.context.Range
+---@class nanocode.context.Range
 ---@field from integer[] { line, col } (1,0-based)
 ---@field to integer[] { line, col } (1,0-based)
 ---@field kind "char"|"line"|"block"
 
 ---@param buf integer
----@return opencode.context.Range|nil
+---@return nanocode.context.Range|nil
 local function selection(buf)
   local mode = vim.fn.mode()
   local kind = (mode == "V" and "line") or (mode == "v" and "char") or (mode == "\22" and "block")
@@ -68,7 +68,7 @@ local function selection(buf)
 end
 
 ---@param buf integer
----@param range opencode.context.Range
+---@param range nanocode.context.Range
 local function highlight(buf, range)
   local end_row = range.to[1] - (range.kind == "line" and 0 or 1)
   local end_col = nil
@@ -83,7 +83,7 @@ local function highlight(buf, range)
   })
 end
 
----@param range? opencode.context.Range The range of the operator or visual selection. Defaults to current visual selection, if any.
+---@param range? nanocode.context.Range The range of the operator or visual selection. Defaults to current visual selection, if any.
 function Context.new(range)
   local self = setmetatable({}, Context)
   self.win = last_used_valid_win()
@@ -111,7 +111,7 @@ end
 ---@param prompt string
 ---@return { input: snacks.picker.Text[], output: snacks.picker.Text[] }
 function Context:render(prompt)
-  local contexts = require("opencode.config").opts.contexts or {}
+  local contexts = require("nanocode.config").opts.contexts or {}
   local agents = self.agents or {}
   local context_placeholders = vim.tbl_keys(contexts)
   table.sort(context_placeholders, function(a, b)
@@ -123,14 +123,14 @@ function Context:render(prompt)
   for _, context_placeholder in ipairs(context_placeholders) do
     placeholders[context_placeholder] = {
       input = function()
-        return { context_placeholder, "OpencodeContextPlaceholder" }
+        return { context_placeholder, "nanocodeContextPlaceholder" }
       end,
       output = function()
         local value = contexts[context_placeholder](self)
         if value then
-          return { value, "OpencodeContextValue" }
+          return { value, "nanocodeContextValue" }
         else
-          return { context_placeholder, "OpencodeContextPlaceholder" }
+          return { context_placeholder, "nanocodeContextPlaceholder" }
         end
       end,
     }
@@ -139,10 +139,10 @@ function Context:render(prompt)
     local agent_placeholder = "@" .. agent.name
     placeholders[agent_placeholder] = {
       input = function()
-        return { agent_placeholder, "OpencodeAgent" }
+        return { agent_placeholder, "nanocodeAgent" }
       end,
       output = function()
-        return { agent_placeholder, "OpencodeAgent" }
+        return { agent_placeholder, "nanocodeAgent" }
       end,
     }
   end
@@ -230,14 +230,14 @@ function Context.extmarks(rendered)
   return extmarks
 end
 
----Format a location for `opencode`.
----e.g. `@opencode.lua L21:C10-L65:C11`
+---Format a location for `nanocode`.
+---e.g. `@nanocode.lua L21:C10-L65:C11`
 ---@param args { buf?: integer, path?: string, start_line?: integer, start_col?: integer, end_line?: integer, end_col?: integer }
 function Context.format(args)
   local result = ""
   if (args.buf and is_buf_valid(args.buf)) or args.path then
     local rel_path = vim.fn.fnamemodify(args.path or vim.api.nvim_buf_get_name(args.buf), ":.")
-    -- Must be preceeded by @ and followed by space for `opencode` to parse as a file reference
+    -- Must be preceeded by @ and followed by space for `nanocode` to parse as a file reference
     result = "@" .. rel_path .. " "
   end
   if args.start_line and args.end_line and args.start_line > args.end_line then
@@ -386,7 +386,7 @@ end
 ---The git diff (unified diff format).
 function Context:git_diff()
   local result = vim.system({ "git", "--no-pager", "diff" }, { text = true }):wait()
-  require("opencode.util").check_system_call(result, "git diff")
+  require("nanocode.util").check_system_call(result, "git diff")
   if result.stdout == "" then
     return nil
   end

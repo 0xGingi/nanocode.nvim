@@ -1,7 +1,7 @@
----Provide an embedded `opencode` via a [Neovim terminal](https://neovim.io/doc/user/terminal.html) buffer.
----@class opencode.provider.Terminal : opencode.Provider
+---Provide an embedded `nanocode` via a [Neovim terminal](https://neovim.io/doc/user/terminal.html) buffer.
+---@class nanocode.provider.Terminal : nanocode.Provider
 ---
----@field opts opencode.provider.terminal.Opts
+---@field opts nanocode.provider.terminal.Opts
 ---
 ---@field bufnr? integer
 ---@field winid? integer
@@ -9,7 +9,7 @@ local Terminal = {}
 Terminal.__index = Terminal
 Terminal.name = "terminal"
 
----@class opencode.provider.terminal.Opts : vim.api.keyset.win_config
+---@class nanocode.provider.terminal.Opts : vim.api.keyset.win_config
 
 function Terminal.new(opts)
   local self = setmetatable({}, Terminal)

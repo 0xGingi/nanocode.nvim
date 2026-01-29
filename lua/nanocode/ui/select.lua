@@ -2,49 +2,49 @@
 
 local M = {}
 
----@class opencode.select.Opts : snacks.picker.ui_select.Opts
+---@class nanocode.select.Opts : snacks.picker.ui_select.Opts
 ---
 ---Configure the displayed sections.
----@field sections? opencode.select.sections.Opts
+---@field sections? nanocode.select.sections.Opts
 
----@class opencode.select.sections.Opts
+---@class nanocode.select.sections.Opts
 ---
 ---Whether to show the prompts section.
 ---@field prompts? boolean
 ---
 ---Commands to display, and their descriptions.
 ---Or `false` to hide the commands section.
----@field commands? table<opencode.Command|string, string>|false
+---@field commands? table<nanocode.Command|string, string>|false
 ---
 ---Whether to show the provider section.
 ---Always `false` if no provider is available.
 ---@field provider? boolean
 
----Select from all `opencode.nvim` functionality.
+---Select from all `nanocode.nvim` functionality.
 ---
 --- - Prompts
 --- - Commands
----   - Fetches custom commands from `opencode`
+---   - Fetches custom commands from `nanocode`
 --- - Provider controls
 ---
 --- Highlights and previews items when using `snacks.picker`.
 ---
----@param opts? opencode.select.Opts Override configured options for this call.
+---@param opts? nanocode.select.Opts Override configured options for this call.
 function M.select(opts)
-  opts = vim.tbl_deep_extend("force", require("opencode.config").opts.select or {}, opts or {})
-  if not require("opencode.config").provider then
+  opts = vim.tbl_deep_extend("force", require("nanocode.config").opts.select or {}, opts or {})
+  if not require("nanocode.config").provider then
     opts.sections.provider = false
   end
 
   -- TODO: Should merge with prompts' optional contexts
-  local context = require("opencode.context").new()
+  local context = require("nanocode.context").new()
 
-  require("opencode.cli.server")
+  require("nanocode.cli.server")
     .get_port()
     :next(function(port)
       if opts.sections.prompts then
-        return require("opencode.promise").new(function(resolve)
-          require("opencode.cli.client").get_agents(port, function(agents)
+        return require("nanocode.promise").new(function(resolve)
+          require("nanocode.cli.client").get_agents(port, function(agents)
             context.agents = vim.tbl_filter(function(agent)
               return agent.mode == "subagent"
             end, agents)
@@ -58,8 +58,8 @@ function M.select(opts)
     end)
     :next(function(port)
       if opts.sections.commands then
-        return require("opencode.promise").new(function(resolve)
-          require("opencode.cli.client").get_commands(port, function(custom_commands)
+        return require("nanocode.promise").new(function(resolve)
+          require("nanocode.cli.client").get_commands(port, function(custom_commands)
             resolve(custom_commands)
           end)
         end)
@@ -68,8 +68,8 @@ function M.select(opts)
       end
     end)
     :next(function(custom_commands)
-      local prompts = require("opencode.config").opts.prompts or {}
-      local commands = require("opencode.config").opts.select.sections.commands or {}
+      local prompts = require("nanocode.config").opts.prompts or {}
+      local commands = require("nanocode.config").opts.select.sections.commands or {}
       for _, command in ipairs(custom_commands) do
         commands[command.name] = command.description
       end
@@ -146,22 +146,22 @@ function M.select(opts)
         table.insert(items, {
           __type = "provider",
           name = "toggle",
-          text = "Toggle opencode",
-          highlights = { { "Toggle opencode", "Comment" } },
+          text = "Toggle nanocode",
+          highlights = { { "Toggle nanocode", "Comment" } },
           preview = { text = "" },
         })
         table.insert(items, {
           __type = "provider",
           name = "start",
-          text = "Start opencode",
-          highlights = { { "Start opencode", "Comment" } },
+          text = "Start nanocode",
+          highlights = { { "Start nanocode", "Comment" } },
           preview = { text = "" },
         })
         table.insert(items, {
           __type = "provider",
           name = "stop",
-          text = "Stop opencode",
-          highlights = { { "Stop opencode", "Comment" } },
+          text = "Stop nanocode",
+          highlights = { { "Stop nanocode", "Comment" } },
           preview = { text = "" },
         })
       end
@@ -212,27 +212,27 @@ function M.select(opts)
         end
 
         if choice.__type == "prompt" then
-          ---@type opencode.Prompt
-          local prompt = require("opencode.config").opts.prompts[choice.name]
+          ---@type nanocode.Prompt
+          local prompt = require("nanocode.config").opts.prompts[choice.name]
           prompt.context = context
           if prompt.ask then
-            require("opencode").ask(prompt.prompt, prompt)
+            require("nanocode").ask(prompt.prompt, prompt)
           else
-            require("opencode").prompt(prompt.prompt, prompt)
+            require("nanocode").prompt(prompt.prompt, prompt)
           end
         elseif choice.__type == "command" then
           if choice.name == "session.select" then
-            require("opencode").select_session()
+            require("nanocode").select_session()
           else
-            require("opencode").command(choice.name)
+            require("nanocode").command(choice.name)
           end
         elseif choice.__type == "provider" then
           if choice.name == "toggle" then
-            require("opencode").toggle()
+            require("nanocode").toggle()
           elseif choice.name == "start" then
-            require("opencode").start()
+            require("nanocode").start()
           elseif choice.name == "stop" then
-            require("opencode").stop()
+            require("nanocode").stop()
           end
         end
       end)

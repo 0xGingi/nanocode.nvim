@@ -1,17 +1,17 @@
 ---@module 'snacks'
 
----Provide an embedded `opencode` via [`snacks.terminal`](https://github.com/folke/snacks.nvim/blob/main/docs/terminal.md).
----@class opencode.provider.Snacks : opencode.Provider
+---Provide an embedded `nanocode` via [`snacks.terminal`](https://github.com/folke/snacks.nvim/blob/main/docs/terminal.md).
+---@class nanocode.provider.Snacks : nanocode.Provider
 ---
 ---@field opts snacks.terminal.Opts
 local Snacks = {}
 Snacks.__index = Snacks
 Snacks.name = "snacks"
 
----@class opencode.provider.snacks.Opts : snacks.terminal.Opts
+---@class nanocode.provider.snacks.Opts : snacks.terminal.Opts
 
----@param opts? opencode.provider.snacks.Opts
----@return opencode.provider.Snacks
+---@param opts? nanocode.provider.snacks.Opts
+---@return nanocode.provider.Snacks
 function Snacks.new(opts)
   local self = setmetatable({}, Snacks)
   self.opts = opts or {}

@@ -1,18 +1,18 @@
----Provide `opencode` in a `kitty` terminal instance.
+---Provide `nanocode` in a `kitty` terminal instance.
 ---Requires [kitty remote control](https://sw.kovidgoyal.net/kitty/remote-control/#remote-control-via-a-socket) to be enabled.
----@class opencode.provider.Kitty : opencode.Provider
+---@class nanocode.provider.Kitty : nanocode.Provider
 ---
----@field opts opencode.provider.kitty.Opts
+---@field opts nanocode.provider.kitty.Opts
 ---
----The `kitty` window ID where `opencode` is running (internal use only).
+---The `kitty` window ID where `nanocode` is running (internal use only).
 ---@field window_id? number
 local Kitty = {}
 Kitty.__index = Kitty
 Kitty.name = "kitty"
 
----@class opencode.provider.kitty.Opts
+---@class nanocode.provider.kitty.Opts
 ---
----Location where `opencode` instance should be opened.
+---Location where `nanocode` instance should be opened.
 ---Possible values:
 --- * https://sw.kovidgoyal.net/kitty/launch/#cmdoption-launch-location
 --- * `tab`
@@ -23,8 +23,8 @@ Kitty.name = "kitty"
 ---https://sw.kovidgoyal.net/kitty/remote-control/#cmdoption-kitten-password
 ---@field password? string
 ---
----@param opts? opencode.provider.kitty.Opts
----@return opencode.provider.Kitty
+---@param opts? nanocode.provider.kitty.Opts
+---@return nanocode.provider.Kitty
 function Kitty.new(opts)
   local self = setmetatable({}, Kitty)
   self.opts = opts or {}
@@ -70,7 +70,7 @@ function Kitty:kitty_exec(args)
   return output, code
 end
 
----Get the `kitty` window ID where we started `opencode`, if it still exists.
+---Get the `kitty` window ID where we started `nanocode`, if it still exists.
 ---@return number|nil window_id
 function Kitty:get_window_id()
   if self.window_id then
@@ -85,7 +85,7 @@ function Kitty:get_window_id()
   return self.window_id
 end
 
----Toggle `opencode` in window.
+---Toggle `nanocode` in window.
 function Kitty:toggle()
   local window_id = self:get_window_id()
   if not window_id then
@@ -95,7 +95,7 @@ function Kitty:toggle()
   end
 end
 
----Start `opencode` in window.
+---Start `nanocode` in window.
 function Kitty:start()
   local window_id = self:get_window_id()
   if window_id then
@@ -144,7 +144,7 @@ function Kitty:start()
   end
 end
 
----Stop `opencode` window.
+---Stop `nanocode` window.
 function Kitty:stop()
   local window_id = self:get_window_id()
   if window_id then

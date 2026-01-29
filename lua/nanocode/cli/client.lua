@@ -1,10 +1,10 @@
----Call the `opencode` server.
---- - [docs](https://opencode.ai/docs/server/#apis)
---- - [implementation](https://github.com/sst/opencode/blob/dev/packages/opencode/src/server/server.ts)
+---Call the `nanocode` server.
+--- - [docs](https://nanocode.ai/docs/server/#apis)
+--- - [implementation](https://github.com/sst/nanocode/blob/dev/packages/nanocode/src/server/server.ts)
 local M = {}
 
 local sse_state = {
-  -- Track the port - `opencode` may have restarted, usually on a new port
+  -- Track the port - `nanocode` may have restarted, usually on a new port
   port = nil,
   ---@type number|nil
   job_id = nil,
@@ -93,7 +93,7 @@ local function curl(url, method, body, callback)
           vim.notify(
             "Response decode error: " .. full_event .. "; " .. response,
             vim.log.levels.ERROR,
-            { title = "opencode" }
+            { title = "nanocode" }
           )
         end
       end)
@@ -137,13 +137,13 @@ local function curl(url, method, body, callback)
           .. code
           .. "\nstderr:\n"
           .. (#stderr_lines > 0 and table.concat(stderr_lines, "\n") or "<none>")
-        vim.notify(error_message, vim.log.levels.ERROR, { title = "opencode" })
+        vim.notify(error_message, vim.log.levels.ERROR, { title = "nanocode" })
       end
     end,
   })
 end
 
----Call an opencode server endpoint.
+---Call an nanocode server endpoint.
 ---@param port number
 ---@param path string
 ---@param method "GET"|"POST"
@@ -161,7 +161,7 @@ function M.tui_append_prompt(text, port, callback)
   M.call(port, "/tui/publish", "POST", { type = "tui.prompt.append", properties = { text = text } }, callback)
 end
 
----@param command opencode.Command|string
+---@param command nanocode.Command|string
 ---@param port number
 ---@param callback fun(response: table)|nil
 function M.tui_execute_command(command, port, callback)
@@ -201,49 +201,49 @@ function M.permit(port, permission, reply, callback)
   }, callback)
 end
 
----@class opencode.cli.client.Agent
+---@class nanocode.cli.client.Agent
 ---@field name string
 ---@field description string
 ---@field mode "primary"|"subagent"
 
 ---@param port number
----@param callback fun(agents: opencode.cli.client.Agent[])
+---@param callback fun(agents: nanocode.cli.client.Agent[])
 function M.get_agents(port, callback)
   M.call(port, "/agent", "GET", nil, callback)
 end
 
----@class opencode.cli.client.Command
+---@class nanocode.cli.client.Command
 ---@field name string
 ---@field description string
 ---@field template string
 ---@field agent string
 
----Get custom commands from `opencode`.
+---Get custom commands from `nanocode`.
 ---
 ---@param port number
----@param callback fun(commands: opencode.cli.client.Command[])
+---@param callback fun(commands: nanocode.cli.client.Command[])
 function M.get_commands(port, callback)
   M.call(port, "/command", "GET", nil, callback)
 end
 
----@class opencode.cli.client.SessionTime
+---@class nanocode.cli.client.SessionTime
 ---@field created integer time in milliseconds
 ---@field updated integer time in milliseconds
 
----@class opencode.cli.client.Session
+---@class nanocode.cli.client.Session
 ---@field id string
 ---@field title string
----@field time opencode.cli.client.SessionTime
+---@field time nanocode.cli.client.SessionTime
 
----Get sessions from `opencode`.
+---Get sessions from `nanocode`.
 ---
 ---@param port number
----@param callback fun(sessions: opencode.cli.client.Session[])
+---@param callback fun(sessions: nanocode.cli.client.Session[])
 function M.get_sessions(port, callback)
   M.call(port, "/session", "GET", nil, callback)
 end
 
----Select session in `opencode`.
+---Select session in `nanocode`.
 ---
 ---@param port number
 ---@param session_id number
@@ -251,12 +251,12 @@ function M.select_session(port, session_id)
   M.call(port, "/tui/select-session", "POST", { sessionID = session_id }, nil)
 end
 
----@class opencode.cli.client.PathResponse
+---@class nanocode.cli.client.PathResponse
 ---@field directory string
 ---@field worktree string
 
 ---@param port number
----@return opencode.cli.client.PathResponse
+---@return nanocode.cli.client.PathResponse
 function M.get_path(port)
   -- Query each port synchronously for working directory
   -- TODO: Migrate to align with async paradigm used elsewhere
@@ -269,17 +269,17 @@ function M.get_path(port)
       "http://localhost:" .. port .. "/path",
     })
     :wait()
-  require("opencode.util").check_system_call(curl_result, "curl")
+  require("nanocode.util").check_system_call(curl_result, "curl")
 
   local path_ok, path_data = pcall(vim.fn.json_decode, curl_result.stdout)
   if path_ok and (path_data.directory or path_data.worktree) then
     return path_data
   else
-    error("Failed to parse `opencode` CWD data: " .. curl_result.stdout, 0)
+    error("Failed to parse `nanocode` CWD data: " .. curl_result.stdout, 0)
   end
 end
 
----@class opencode.cli.client.Event
+---@class nanocode.cli.client.Event
 ---@field type string
 ---@field properties table
 
@@ -287,7 +287,7 @@ end
 ---Stops any previous subscription, so only one is active at a time.
 ---
 ---@param port number
----@param callback fun(response: opencode.cli.client.Event)|nil
+---@param callback fun(response: nanocode.cli.client.Event)|nil
 function M.sse_subscribe(port, callback)
   if sse_state.port ~= port then
     if sse_state.job_id then

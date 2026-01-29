@@ -1,22 +1,22 @@
 local M = {}
 
----@alias opencode.status.Status
+---@alias nanocode.status.Status
 ---| "idle"
 ---| "error"
 ---| "responding"
 ---| "requesting_permission"
 
----@alias opencode.status.Icon
+---@alias nanocode.status.Icon
 ---| "󰚩"
 ---| "󱜙"
 ---| "󱚟"
 ---| "󱚡"
 ---| "󱚧"
 
----@type opencode.status.Status|nil
+---@type nanocode.status.Status|nil
 M.status = nil
 
----@return opencode.status.Icon
+---@return nanocode.status.Icon
 function M.statusline()
   if M.status == "idle" then
     return "󰚩"
@@ -31,7 +31,7 @@ function M.statusline()
   end
 end
 
----@param event opencode.cli.client.Event
+---@param event nanocode.cli.client.Event
 function M.update(event)
   if
     event.type == "server.connected"
@@ -55,7 +55,7 @@ function M.update(event)
   elseif event.type == "session.error" then
     M.status = "error"
   elseif event.type == "server.disconnected" then
-    -- NOTE: *we* send server.disconnected when unsubscribing or `opencode`'s heartbeat disappears
+    -- NOTE: *we* send server.disconnected when unsubscribing or `nanocode`'s heartbeat disappears
     M.status = nil
   end
 end

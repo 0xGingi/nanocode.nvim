@@ -2,47 +2,47 @@
 
 local M = {}
 
----Your `opencode.nvim` configuration.
+---Your `nanocode.nvim` configuration.
 ---Passed via global variable for [simpler UX and faster startup](https://mrcjkb.dev/posts/2023-08-22-setup.html).
 ---
 ---Note that Neovim does not yet support metatables or mixed integer and string keys in `vim.g`, affecting some `snacks.nvim` options.
----In that case you may modify `require("opencode.config").opts` directly.
----See [opencode.nvim #36](https://github.com/NickvanDyke/opencode.nvim/issues/36) and [neovim #12544](https://github.com/neovim/neovim/issues/12544#issuecomment-1116794687).
----@type opencode.Opts|nil
-vim.g.opencode_opts = vim.g.opencode_opts
+---In that case you may modify `require("nanocode.config").opts` directly.
+---See [nanocode.nvim #36](https://github.com/nanogpt-community/nanocode.nvim/issues/36) and [neovim #12544](https://github.com/neovim/neovim/issues/12544#issuecomment-1116794687).
+---@type nanocode.Opts|nil
+vim.g.nanocode_opts = vim.g.nanocode_opts
 
----@class opencode.Opts
+---@class nanocode.Opts
 ---
----The port `opencode` is running on.
----If `nil`, searches for an `opencode` process inside Neovim's CWD.
----If set, `opencode.nvim` will append `--port <port>` to `provider.cmd`.
+---The port `nanocode` is running on.
+---If `nil`, searches for an `nanocode` process inside Neovim's CWD.
+---If set, `nanocode.nvim` will append `--port <port>` to `provider.cmd`.
 ---@field port? number
 ---
 ---Contexts to inject into prompts, keyed by their placeholder.
----@field contexts? table<string, fun(context: opencode.Context): string|nil>
+---@field contexts? table<string, fun(context: nanocode.Context): string|nil>
 ---
 ---Prompts to reference or select from.
----@field prompts? table<string, opencode.Prompt>
+---@field prompts? table<string, nanocode.Prompt>
 ---
 ---Options for `ask()`.
 ---Supports [`snacks.input`](https://github.com/folke/snacks.nvim/blob/main/docs/input.md).
----@field ask? opencode.ask.Opts
+---@field ask? nanocode.ask.Opts
 ---
 ---Options for `select()`.
 ---Supports [`snacks.picker`](https://github.com/folke/snacks.nvim/blob/main/docs/picker.md).
----@field select? opencode.select.Opts
+---@field select? nanocode.select.Opts
 ---
----Options for `opencode` event handling.
----@field events? opencode.events.Opts
+---Options for `nanocode` event handling.
+---@field events? nanocode.events.Opts
 ---
----Provide an integrated `opencode` when one is not found.
----@field provider? opencode.Provider|opencode.provider.Opts
+---Provide an integrated `nanocode` when one is not found.
+---@field provider? nanocode.Provider|nanocode.provider.Opts
 
----@class opencode.Prompt : opencode.api.prompt.Opts
----@field prompt string The prompt to send to `opencode`.
+---@class nanocode.Prompt : nanocode.api.prompt.Opts
+---@field prompt string The prompt to send to `nanocode`.
 ---@field ask? boolean Call `ask(prompt)` instead of `prompt(prompt)`. Useful for prompts that expect additional user input.
 
----@type opencode.Opts
+---@type nanocode.Opts
 local defaults = {
   port = nil,
   -- stylua: ignore
@@ -71,8 +71,8 @@ local defaults = {
     test = { prompt = "Add tests for @this", submit = true },
   },
   ask = {
-    prompt = "Ask opencode: ",
-    blink_cmp_sources = { "opencode", "buffer" },
+    prompt = "Ask nanocode: ",
+    blink_cmp_sources = { "nanocode", "buffer" },
     snacks = {
       icon = "󰚩 ",
       win = {
@@ -84,7 +84,7 @@ local defaults = {
     },
   },
   select = {
-    prompt = "opencode: ",
+    prompt = "nanocode: ",
     sections = {
       prompts = true,
       commands = {
@@ -118,36 +118,36 @@ local defaults = {
     },
   },
   provider = {
-    cmd = "opencode --port",
+    cmd = "nanocode --port",
     enabled = vim.tbl_filter(
-      ---@param provider opencode.Provider
+      ---@param provider nanocode.Provider
       function(provider)
         return provider.health() == true
       end,
-      require("opencode.provider").list()
+      require("nanocode.provider").list()
     )[1].name,
     terminal = {
       split = "right",
       width = math.floor(vim.o.columns * 0.35),
     },
     snacks = {
-      auto_close = true, -- Close the terminal when `opencode` exits
+      auto_close = true, -- Close the terminal when `nanocode` exits
       win = {
         position = "right",
         enter = false, -- Stay in the editor after opening the terminal
         wo = {
-          winbar = "", -- Title is unnecessary - `opencode` TUI has its own footer
+          winbar = "", -- Title is unnecessary - `nanocode` TUI has its own footer
         },
         bo = {
           -- Make it easier to target for customization, and prevent possibly unintended `"snacks_terminal"` targeting.
           -- e.g. the recommended edgy.nvim integration puts all `"snacks_terminal"` windows at the bottom.
-          filetype = "opencode_terminal",
+          filetype = "nanocode_terminal",
         },
       },
     },
     kitty = {
-      -- Copy the editor's environment so `opencode` has access to e.g. Mason-installed binaries
-      cmd = "--copy-env opencode --port",
+      -- Copy the editor's environment so `nanocode` has access to e.g. Mason-installed binaries
+      cmd = "--copy-env nanocode --port",
       location = "default",
     },
     -- These are wezterm's internal defaults
@@ -166,13 +166,13 @@ local defaults = {
   },
 }
 
----Plugin options, lazily merged from `defaults` and `vim.g.opencode_opts`.
----@type opencode.Opts
-M.opts = vim.tbl_deep_extend("force", vim.deepcopy(defaults), vim.g.opencode_opts or {})
+---Plugin options, lazily merged from `defaults` and `vim.g.nanocode_opts`.
+---@type nanocode.Opts
+M.opts = vim.tbl_deep_extend("force", vim.deepcopy(defaults), vim.g.nanocode_opts or {})
 
 -- Allow removing default `contexts` and `prompts` by setting them to `false` in your user config.
 -- TODO: Add to type definition, and apply to `opts.select.commands`.
-local user_opts = vim.g.opencode_opts or {}
+local user_opts = vim.g.nanocode_opts or {}
 for _, field in ipairs({ "contexts", "prompts" }) do
   if user_opts[field] and M.opts[field] then
     for k, v in pairs(user_opts[field]) do
@@ -183,11 +183,11 @@ for _, field in ipairs({ "contexts", "prompts" }) do
   end
 end
 
----The `opencode` provider resolved from `opts.provider`.
+---The `nanocode` provider resolved from `opts.provider`.
 ---
 ---Retains the base `provider.cmd` if not overridden.
 ---Sets `--port <port>` in `provider.cmd` if `opts.port` is set.
----@type opencode.Provider|nil
+---@type nanocode.Provider|nil
 M.provider = (function()
   local provider
   local provider_or_opts = M.opts.provider
@@ -195,17 +195,17 @@ M.provider = (function()
   if provider_or_opts and (provider_or_opts.toggle or provider_or_opts.start or provider_or_opts.stop) then
     -- An implementation was passed.
     -- Beware: `provider.enabled` may still exist from merging with defaults.
-    ---@cast provider_or_opts opencode.Provider
+    ---@cast provider_or_opts nanocode.Provider
     provider = provider_or_opts
   elseif provider_or_opts and provider_or_opts.enabled then
     -- Resolve the built-in provider.
-    ---@type boolean, opencode.Provider
-    local ok, resolved_provider = pcall(require, "opencode.provider." .. provider_or_opts.enabled)
+    ---@type boolean, nanocode.Provider
+    local ok, resolved_provider = pcall(require, "nanocode.provider." .. provider_or_opts.enabled)
     if not ok then
       vim.notify(
-        "Failed to load `opencode` provider '" .. provider_or_opts.enabled .. "': " .. resolved_provider,
+        "Failed to load `nanocode` provider '" .. provider_or_opts.enabled .. "': " .. resolved_provider,
         vim.log.levels.ERROR,
-        { title = "opencode" }
+        { title = "nanocode" }
       )
       return nil
     end

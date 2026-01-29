@@ -1,4 +1,4 @@
----@class opencode.events.permissions.Opts
+---@class nanocode.events.permissions.Opts
 ---
 ---Whether to show permission requests.
 ---@field enabled boolean
@@ -36,15 +36,15 @@ end
 local is_permission_request_open = false
 
 vim.api.nvim_create_autocmd("User", {
-  group = vim.api.nvim_create_augroup("OpencodePermissions", { clear = true }),
-  pattern = { "OpencodeEvent:permission.asked", "OpencodeEvent:permission.replied" },
+  group = vim.api.nvim_create_augroup("nanocodePermissions", { clear = true }),
+  pattern = { "nanocodeEvent:permission.asked", "nanocodeEvent:permission.replied" },
   callback = function(args)
-    ---@type opencode.cli.client.Event
+    ---@type nanocode.cli.client.Event
     local event = args.data.event
     ---@type number
     local port = args.data.port
 
-    local opts = require("opencode.config").opts.events.permissions or {}
+    local opts = require("nanocode.config").opts.events.permissions or {}
     if not opts.enabled then
       return
     end
@@ -52,14 +52,14 @@ vim.api.nvim_create_autocmd("User", {
     if event.type == "permission.asked" then
       local idle_delay_ms = opts.idle_delay_ms
       vim.notify(
-        "`opencode` requested permission — awaiting idle…",
+        "`nanocode` requested permission — awaiting idle…",
         vim.log.levels.INFO,
-        { title = "opencode", timeout = idle_delay_ms }
+        { title = "nanocode", timeout = idle_delay_ms }
       )
       on_user_idle(idle_delay_ms, function()
         is_permission_request_open = true
         vim.ui.select({ "Once", "Always", "Reject" }, {
-          prompt = "Permit opencode to: " .. event.properties.permission .. " " .. table.concat(
+          prompt = "Permit nanocode to: " .. event.properties.permission .. " " .. table.concat(
             event.properties.patterns,
             ", "
           ) .. "?: ",
@@ -69,7 +69,7 @@ vim.api.nvim_create_autocmd("User", {
         }, function(choice)
           is_permission_request_open = false
           if choice then
-            require("opencode.cli.client").permit(port, event.properties.id, choice:lower())
+            require("nanocode.cli.client").permit(port, event.properties.id, choice:lower())
           end
         end)
       end)
@@ -82,5 +82,5 @@ vim.api.nvim_create_autocmd("User", {
       -- is_permission_request_open = false
     end
   end,
-  desc = "Display permission requests from opencode",
+  desc = "Display permission requests from nanocode",
 })

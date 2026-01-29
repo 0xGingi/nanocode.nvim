@@ -1,12 +1,11 @@
-# opencode.nvim
+# nanocode.nvim
 
-Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neovim — streamline editor-aware research, reviews, and requests.
+Integrate the [nanocode](https://github.com/nnanocode) AI assistant with Neovim — streamline editor-aware research, reviews, and requests.
 
-<https://github.com/user-attachments/assets/077daa78-d401-4b8b-98d1-9ba9f94c2330>
 
 ## ✨ Features
 
-- Auto-connect to _any_ `opencode` running inside Neovim's CWD, or provide an integrated instance.
+- Auto-connect to _any_ `nanocode` running inside Neovim's CWD, or provide an integrated instance.
 - Share editor context (buffer, cursor, selection, diagnostics, etc.).
 - Input prompts with completions, highlights, and normal-mode support.
 - Select prompts from a library and define your own.
@@ -24,7 +23,7 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
 
 ```lua
 {
-  "NickvanDyke/opencode.nvim",
+  "nanogpt-community/nanocode.nvim",
   dependencies = {
     -- Recommended for `ask()` and `select()`.
     -- Required for `snacks` provider.
@@ -32,24 +31,24 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
     { "folke/snacks.nvim", opts = { input = {}, picker = {}, terminal = {} } },
   },
   config = function()
-    ---@type opencode.Opts
-    vim.g.opencode_opts = {
-      -- Your configuration, if any — see `lua/opencode/config.lua`, or "goto definition" on the type or field.
+    ---@type nanocode.Opts
+    vim.g.nanocode = {
+      -- Your configuration, if any — see `lua/nanocode/config.lua`, or "goto definition" on the type or field.
     }
 
     -- Required for `opts.events.reload`.
     vim.o.autoread = true
 
     -- Recommended/example keymaps.
-    vim.keymap.set({ "n", "x" }, "<C-a>", function() require("opencode").ask("@this: ", { submit = true }) end, { desc = "Ask opencode…" })
-    vim.keymap.set({ "n", "x" }, "<C-x>", function() require("opencode").select() end,                          { desc = "Execute opencode action…" })
-    vim.keymap.set({ "n", "t" }, "<C-.>", function() require("opencode").toggle() end,                          { desc = "Toggle opencode" })
+    vim.keymap.set({ "n", "x" }, "<C-a>", function() require("nanocode").ask("@this: ", { submit = true }) end, { desc = "Ask nanocode…" })
+    vim.keymap.set({ "n", "x" }, "<C-x>", function() require("nanocode").select() end,                          { desc = "Execute nanocode action…" })
+    vim.keymap.set({ "n", "t" }, "<C-.>", function() require("nanocode").toggle() end,                          { desc = "Toggle nanocode" })
 
-    vim.keymap.set({ "n", "x" }, "go",  function() return require("opencode").operator("@this ") end,        { desc = "Add range to opencode", expr = true })
-    vim.keymap.set("n",          "goo", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
+    vim.keymap.set({ "n", "x" }, "go",  function() return require("nanocode").operator("@this ") end,        { desc = "Add range to nanocode", expr = true })
+    vim.keymap.set("n",          "goo", function() return require("nanocode").operator("@this ") .. "_" end, { desc = "Add line to nanocode", expr = true })
 
-    vim.keymap.set("n", "<S-C-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
-    vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
+    vim.keymap.set("n", "<S-C-u>", function() require("nanocode").command("session.half.page.up") end,   { desc = "Scroll nanocode up" })
+    vim.keymap.set("n", "<S-C-d>", function() require("nanocode").command("session.half.page.down") end, { desc = "Scroll nanocode down" })
 
     -- You may want these if you stick with the opinionated "<C-a>" and "<C-x>" above — otherwise consider "<leader>o…".
     vim.keymap.set("n", "+", "<C-a>", { desc = "Increment under cursor", noremap = true })
@@ -63,21 +62,21 @@ Integrate the [opencode](https://github.com/sst/opencode) AI assistant with Neov
 ```nix
 programs.nixvim = {
   extraPlugins = [
-    pkgs.vimPlugins.opencode-nvim
+    pkgs.vimPlugins.nanocode-nvim
   ];
 };
 ```
 
 > [!TIP]
-> Run `:checkhealth opencode` after setup.
+> Run `:checkhealth nanocode` after setup.
 
 ## ⚙️ Configuration
 
-`opencode.nvim` provides a rich and reliable default experience — see all available options and their defaults [here](./lua/opencode/config.lua).
+`nanocode.nvim` provides a rich and reliable default experience — see all available options and their defaults [here](./lua/nanocode/config.lua).
 
 ### Contexts
 
-`opencode.nvim` replaces placeholders in prompts with the corresponding context:
+`nanocode.nvim` replaces placeholders in prompts with the corresponding context:
 
 | Placeholder    | Context                                                       |
 | -------------- | ------------------------------------------------------------- |
@@ -107,20 +106,11 @@ Select or reference prompts to review, explain, and improve your code:
 | `review`      | Review `@this` for correctness and readability                         |
 | `test`        | Add tests for `@this`                                                  |
 
-### Provider
-
-You can manually run `opencode` inside Neovim's CWD however you like and `opencode.nvim` will find it!
-
-If `opencode.nvim` can't find an existing `opencode`, it uses the configured provider (defaulting based on availability) to manage one for you.
-
-> [!IMPORTANT]
-> You _must_ run `opencode` with the `--port` flag to expose its server. Providers do so by default.
-
-<details>
+nanocodenanocodenanocodenanocodenanocode<details>
 <summary><a href="https://neovim.io/doc/user/terminal.html">Neovim terminal</a></summary>
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     enabled = "terminal",
     terminal = {
@@ -136,7 +126,7 @@ vim.g.opencode_opts = {
 <summary><a href="https://github.com/folke/snacks.nvim/blob/main/docs/terminal.md">snacks.terminal</a></summary>
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     enabled = "snacks",
     snacks = {
@@ -152,7 +142,7 @@ vim.g.opencode_opts = {
 <summary><a href="https://sw.kovidgoyal.net/kitty/">kitty</a></summary>
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     enabled = "kitty",
     kitty = {
@@ -191,7 +181,7 @@ listen_on unix:/tmp/kitty
 <summary><a href="https://wezterm.org/">wezterm</a></summary>
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     enabled = "wezterm",
     wezterm = {
@@ -207,7 +197,7 @@ vim.g.opencode_opts = {
 <summary><a href="https://github.com/tmux/tmux">tmux</a></summary>
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     enabled = "tmux",
     tmux = {
@@ -225,7 +215,7 @@ vim.g.opencode_opts = {
 Integrate your custom method for convenience!
 
 ```lua
-vim.g.opencode_opts = {
+vim.g.nanocode_opts = {
   provider = {
     toggle = function(self)
       -- ...
@@ -246,41 +236,41 @@ Please submit PRs adding new providers! 🙂
 
 ## 🚀 Usage
 
-### ✍️ Ask — `require("opencode").ask()`
+### ✍️ Ask — `require("nanocode").ask()`
 
-Input a prompt for `opencode`.
+Input a prompt for `nanocode`.
 
 - Press `<Up>` to browse recent asks.
-- Highlights and completes contexts and `opencode` subagents.
+- Highlights and completes contexts and `nanocode` subagents.
   - Press `<Tab>` to trigger built-in completion.
   - Registers `opts.ask.blink_cmp_sources` when using `snacks.input` and `blink.cmp`.
 
-### 📝 Select — `require("opencode").select()`
+### 📝 Select — `require("nanocode").select()`
 
-Select from all `opencode.nvim` functionality.
+Select from all `nanocode.nvim` functionality.
 
 - Prompts
 - Commands
-  - Fetches custom commands from `opencode`
+  - Fetches custom commands from `nanocode`
 - Provider controls
 
 Highlights and previews items when using `snacks.picker`.
 
-### 🗣️ Prompt — `require("opencode").prompt()`
+### 🗣️ Prompt — `require("nanocode").prompt()`
 
-Prompt `opencode`.
+Prompt `nanocode`.
 
 - Resolves named references to configured prompts.
 - Injects configured contexts.
-- `opencode` will interpret `@` references to files or subagents.
+- `nanocode` will interpret `@` references to files or subagents.
 
-### 🧑‍🔬 Operator — `require("opencode").operator()`
+### 🧑‍🔬 Operator — `require("nanocode").operator()`
 
 Wraps `prompt` as an operator, supporting ranges and dot-repeat.
 
-### 🧑‍🏫 Command — `require("opencode").command()`
+### 🧑‍🏫 Command — `require("nanocode").command()`
 
-Command `opencode`:
+Command `nanocode`:
 
 | Command                  | Description                                        |
 | ------------------------ | -------------------------------------------------- |
@@ -304,14 +294,14 @@ Command `opencode`:
 
 ## 👀 Events
 
-`opencode.nvim` forwards `opencode`'s Server-Sent-Events as an `OpencodeEvent` autocmd:
+`nanocode.nvim` forwards `nanocode`'s Server-Sent-Events as an `nanocodeEvent` autocmd:
 
 ```lua
--- Handle `opencode` events
+-- Handle `nanocode` events
 vim.api.nvim_create_autocmd("User", {
-  pattern = "OpencodeEvent:*", -- Optionally filter event types
+  pattern = "nanocodeEvent:*", -- Optionally filter event types
   callback = function(args)
-    ---@type opencode.cli.client.Event
+    ---@type nanocode.cli.client.Event
     local event = args.data.event
     ---@type number
     local port = args.data.port
@@ -320,7 +310,7 @@ vim.api.nvim_create_autocmd("User", {
     vim.notify(vim.inspect(event))
     -- Do something useful
     if event.type == "session.idle" then
-      vim.notify("`opencode` finished responding")
+      vim.notify("`nanocode` finished responding")
     end
   end,
 })
@@ -328,11 +318,11 @@ vim.api.nvim_create_autocmd("User", {
 
 ### Edits
 
-When `opencode` edits a file, `opencode.nvim` automatically reloads the corresponding buffer.
+When `nanocode` edits a file, `nanocode.nvim` automatically reloads the corresponding buffer.
 
 ### Permissions
 
-When `opencode` requests a permission, `opencode.nvim` waits for idle to ask you to approve or deny it.
+When `nanocode` requests a permission, `nanocode.nvim` waits for idle to ask you to approve or deny it.
 
 ### Statusline
 
@@ -344,7 +334,7 @@ require("lualine").setup({
   sections = {
     lualine_z = {
       {
-        require("opencode").statusline,
+        require("nanocode").statusline,
       },
     }
   }
@@ -355,6 +345,6 @@ require("lualine").setup({
 
 ## 🙏 Acknowledgments
 
-- Inspired by [nvim-aider](https://github.com/GeorgesAlkhouri/nvim-aider), [neopencode.nvim](https://github.com/loukotal/neopencode.nvim), and [sidekick.nvim](https://github.com/folke/sidekick.nvim).
-- Uses `opencode`'s TUI for simplicity — see [sudo-tee/opencode.nvim](https://github.com/sudo-tee/opencode.nvim) for a Neovim frontend.
+- Inspired by [nvim-aider](https://github.com/GeorgesAlkhouri/nvim-aider), [nenanocode.nvim](https://github.com/loukotal/nenanocode.nvim), and [sidekick.nvim](https://github.com/folke/sidekick.nvim).
+- Uses `nanocode`'s TUI for simplicity — see [sudo-tee/nanocode.nvim](https://github.com/sudo-tee/nanocode.nvim) for a Neovim frontend.
 - [mcp-neovim-server](https://github.com/bigcodegen/mcp-neovim-server) may better suit you, but it lacks customization and tool calls are slow and unreliable.

@@ -1,7 +1,7 @@
 local M = {}
 
----See available commands [here](https://github.com/sst/opencode/blob/dev/packages/opencode/src/cli/cmd/tui/event.ts).
----@alias opencode.Command
+---See available commands [here](https://github.com/sst/nanocode/blob/dev/packages/nanocode/src/cli/cmd/tui/event.ts).
+---@alias nanocode.Command
 ---| 'session.list'
 ---| 'session.new'
 ---| 'session.share'
@@ -19,19 +19,19 @@ local M = {}
 ---| 'prompt.clear'
 ---| 'agent.cycle'
 
----Command `opencode`.
+---Command `nanocode`.
 ---
----@param command opencode.Command|string The command to send. Can be built-in or reference your custom commands.
+---@param command nanocode.Command|string The command to send. Can be built-in or reference your custom commands.
 function M.command(command)
-  require("opencode.cli.server")
+  require("nanocode.cli.server")
     .get_port()
     :next(function(port)
       -- No need to register SSE here - commands don't trigger any.
       -- (except maybe the `input_*` commands? but no reason for user to use those).
-      require("opencode.cli.client").tui_execute_command(command, port)
+      require("nanocode.cli.client").tui_execute_command(command, port)
     end)
     :catch(function(err)
-      vim.notify(err, vim.log.levels.ERROR, { title = "opencode" })
+      vim.notify(err, vim.log.levels.ERROR, { title = "nanocode" })
     end)
 end
 

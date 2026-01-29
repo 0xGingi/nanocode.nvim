@@ -3,7 +3,7 @@
 local M = {}
 
 function M.check()
-  vim.health.start("opencode.nvim")
+  vim.health.start("nanocode.nvim")
 
   local uname = vim.uv.os_uname()
   vim.health.info(string.format("OS: %s %s (%s)", uname.sysname, uname.release, uname.machine))
@@ -14,29 +14,29 @@ function M.check()
   local git_hash = vim.fn.system("cd " .. vim.fn.shellescape(plugin_dir) .. " && git rev-parse HEAD")
   if vim.v.shell_error == 0 then
     git_hash = vim.trim(git_hash)
-    vim.health.info("`opencode.nvim` git commit hash: `" .. git_hash .. "`.")
+    vim.health.info("`nanocode.nvim` git commit hash: `" .. git_hash .. "`.")
   else
-    vim.health.warn("Could not determine `opencode.nvim` git commit hash.")
+    vim.health.warn("Could not determine `nanocode.nvim` git commit hash.")
   end
 
-  vim.health.info("`vim.g.opencode_opts`: " .. (vim.g.opencode_opts and vim.inspect(vim.g.opencode_opts) or "`nil`"))
+  vim.health.info("`vim.g.nanocode_opts`: " .. (vim.g.nanocode_opts and vim.inspect(vim.g.nanocode_opts) or "`nil`"))
 
-  if require("opencode.config").opts.events.reload and not vim.o.autoread then
+  if require("nanocode.config").opts.events.reload and not vim.o.autoread then
     vim.health.warn(
-      "`opts.events.reload = true` but `vim.o.autoread = false`: files edited by `opencode` won't be automatically reloaded in buffers.",
+      "`opts.events.reload = true` but `vim.o.autoread = false`: files edited by `nanocode` won't be automatically reloaded in buffers.",
       {
         "Set `vim.o.autoread = true`",
-        "Or set `vim.g.opencode_opts.events.reload = false`",
+        "Or set `vim.g.nanocode_opts.events.reload = false`",
       }
     )
   end
 
-  vim.health.start("opencode.nvim [binaries]")
+  vim.health.start("nanocode.nvim [binaries]")
 
-  if vim.fn.executable("opencode") == 1 then
-    local found_version = vim.fn.system("opencode --version")
+  if vim.fn.executable("nanocode") == 1 then
+    local found_version = vim.fn.system("nanocode --version")
     found_version = vim.trim(vim.split(found_version, "\n")[1])
-    vim.health.ok("`opencode` available with version `" .. found_version .. "`.")
+    vim.health.ok("`nanocode` available with version `" .. found_version .. "`.")
 
     local found_version_parsed = vim.version.parse(found_version)
     local latest_tested_version = "1.1.11"
@@ -44,33 +44,33 @@ function M.check()
     if found_version_parsed and latest_tested_version_parsed then
       if latest_tested_version_parsed[1] ~= found_version_parsed[1] then
         vim.health.warn(
-          "`opencode` version has a `major` version mismatch with latest tested version `"
+          "`nanocode` version has a `major` version mismatch with latest tested version `"
             .. latest_tested_version
             .. "`: may cause compatibility issues."
         )
       elseif found_version_parsed[2] < latest_tested_version_parsed[2] then
         vim.health.warn(
-          "`opencode` version has an older `minor` version than latest tested version `"
+          "`nanocode` version has an older `minor` version than latest tested version `"
             .. latest_tested_version
             .. "`: may cause compatibility issues.",
           {
-            "Update `opencode`.",
+            "Update `nanocode`.",
           }
         )
       elseif found_version_parsed[3] < latest_tested_version_parsed[3] then
         vim.health.warn(
-          "`opencode` version has an older `patch` version than latest tested version `"
+          "`nanocode` version has an older `patch` version than latest tested version `"
             .. latest_tested_version
             .. "`: may cause compatibility issues.",
           {
-            "Update `opencode`.",
+            "Update `nanocode`.",
           }
         )
       end
     end
   else
-    vim.health.error("`opencode` executable not found in `$PATH`.", {
-      "Install `opencode` and ensure it's in your `$PATH`.",
+    vim.health.error("`nanocode` executable not found in `$PATH`.", {
+      "Install `nanocode` and ensure it's in your `$PATH`.",
     })
   end
 
@@ -82,14 +82,14 @@ function M.check()
     })
   end
 
-  -- Binaries for auto-finding `opencode` process (Unix only)
-  if vim.fn.has("win32") == 0 and (not vim.g.opencode_opts or not vim.g.opencode_opts.port) then
+  -- Binaries for auto-finding `nanocode` process (Unix only)
+  if vim.fn.has("win32") == 0 and (not vim.g.nanocode_opts or not vim.g.nanocode_opts.port) then
     if vim.fn.executable("pgrep") == 1 then
       vim.health.ok("`pgrep` available.")
     else
       vim.health.error(
         "`pgrep` executable not found in `$PATH`.",
-        { "Install `pgrep` and ensure it's in your `$PATH`", "Or set `vim.g.opencode_opts.port`." }
+        { "Install `pgrep` and ensure it's in your `$PATH`", "Or set `vim.g.nanocode_opts.port`." }
       )
     end
     if vim.fn.executable("lsof") == 1 then
@@ -97,12 +97,12 @@ function M.check()
     else
       vim.health.error(
         "`lsof` executable not found in `$PATH`.",
-        { "Install `lsof` and ensure it's in your `$PATH`", "Or set `vim.g.opencode_opts.port`." }
+        { "Install `lsof` and ensure it's in your `$PATH`", "Or set `vim.g.nanocode_opts.port`." }
       )
     end
   end
 
-  vim.health.start("opencode.nvim [snacks]")
+  vim.health.start("nanocode.nvim [snacks]")
 
   local snacks_ok, snacks = pcall(require, "snacks")
   ---@cast snacks Snacks Cast because CI lint resolves to our `snacks.lua` instead...
@@ -125,16 +125,16 @@ function M.check()
     vim.health.warn("`snacks.nvim` is not available: `ask()` and `select()` will not be enhanced.")
   end
 
-  vim.health.start("opencode.nvim [providers]")
+  vim.health.start("nanocode.nvim [providers]")
 
-  local configured_provider = require("opencode.config").provider
+  local configured_provider = require("nanocode.config").provider
   if configured_provider then
-    vim.health.ok("Configured `opencode` provider: `" .. configured_provider.name .. "`.")
+    vim.health.ok("Configured `nanocode` provider: `" .. configured_provider.name .. "`.")
   else
-    vim.health.warn("No `opencode` provider configured.")
+    vim.health.warn("No `nanocode` provider configured.")
   end
 
-  for _, provider in ipairs(require("opencode.provider").list()) do
+  for _, provider in ipairs(require("nanocode.provider").list()) do
     local ok, advice = provider.health()
     if ok == true then
       vim.health.ok("The `" .. provider.name .. "` provider is available.")
