@@ -1,6 +1,6 @@
 # nanocode.nvim
 
-Integrate the [nanocode](https://github.com/nnanocode) AI assistant with Neovim — streamline editor-aware research, reviews, and requests.
+Integrate the [nanocode](https://github.com/nanocode) AI assistant with Neovim — streamline editor-aware research, reviews, and requests.
 
 
 ## ✨ Features
@@ -17,7 +17,7 @@ Integrate the [nanocode](https://github.com/nnanocode) AI assistant with Neovim 
 - Sensible defaults with well-documented, flexible configuration and API to fit your workflow.
 - _Vim-y_ — supports ranges and dot-repeat.
 
-## 📦 Setup
+## Setup
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
@@ -70,7 +70,7 @@ programs.nixvim = {
 > [!TIP]
 > Run `:checkhealth nanocode` after setup.
 
-## ⚙️ Configuration
+## Configuration
 
 `nanocode.nvim` provides a rich and reliable default experience — see all available options and their defaults [here](./lua/nanocode/config.lua).
 
@@ -232,11 +232,9 @@ vim.g.nanocode_opts = {
 
 </details>
 
-Please submit PRs adding new providers! 🙂
+## Usage
 
-## 🚀 Usage
-
-### ✍️ Ask — `require("nanocode").ask()`
+### Ask — `require("nanocode").ask()`
 
 Input a prompt for `nanocode`.
 
@@ -245,7 +243,7 @@ Input a prompt for `nanocode`.
   - Press `<Tab>` to trigger built-in completion.
   - Registers `opts.ask.blink_cmp_sources` when using `snacks.input` and `blink.cmp`.
 
-### 📝 Select — `require("nanocode").select()`
+### Select — `require("nanocode").select()`
 
 Select from all `nanocode.nvim` functionality.
 
@@ -256,7 +254,7 @@ Select from all `nanocode.nvim` functionality.
 
 Highlights and previews items when using `snacks.picker`.
 
-### 🗣️ Prompt — `require("nanocode").prompt()`
+### Prompt — `require("nanocode").prompt()`
 
 Prompt `nanocode`.
 
@@ -264,11 +262,11 @@ Prompt `nanocode`.
 - Injects configured contexts.
 - `nanocode` will interpret `@` references to files or subagents.
 
-### 🧑‍🔬 Operator — `require("nanocode").operator()`
+### Operator — `require("nanocode").operator()`
 
 Wraps `prompt` as an operator, supporting ranges and dot-repeat.
 
-### 🧑‍🏫 Command — `require("nanocode").command()`
+### Command — `require("nanocode").command()`
 
 Command `nanocode`:
 
@@ -292,7 +290,7 @@ Command `nanocode`:
 | `prompt.clear`           | Clear the TUI input                                |
 | `agent.cycle`            | Cycle the selected agent                           |
 
-## 👀 Events
+## Events
 
 `nanocode.nvim` forwards `nanocode`'s Server-Sent-Events as an `nanocodeEvent` autocmd:
 
@@ -343,8 +341,6 @@ require("lualine").setup({
 
 </details>
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- Inspired by [nvim-aider](https://github.com/GeorgesAlkhouri/nvim-aider), [nenanocode.nvim](https://github.com/loukotal/nenanocode.nvim), and [sidekick.nvim](https://github.com/folke/sidekick.nvim).
-- Uses `nanocode`'s TUI for simplicity — see [sudo-tee/nanocode.nvim](https://github.com/sudo-tee/nanocode.nvim) for a Neovim frontend.
-- [mcp-neovim-server](https://github.com/bigcodegen/mcp-neovim-server) may better suit you, but it lacks customization and tool calls are slow and unreliable.
+- Forked from [opencode.nvim](https://github.com/nickjvandyke/opencode.nvim)
